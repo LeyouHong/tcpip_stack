@@ -94,9 +94,9 @@ static cli_register_cb
 		nmp_config_cli_tree,
     isis_config_cli_tree,
 		
-        /*  Add more CB here */
-        
-        0 /* Last member must be NULL */
+    /*  Add more CB here */
+    
+    0 /* Last member must be NULL */
 	};
 
 /* show node <node-name> protocol ... */
@@ -105,10 +105,10 @@ static cli_register_cb
 	{
 		ddcp_show_cli_tree,
 		nmp_show_cli_tree,
-		
-        /* Add more CB here */
+		isis_show_cli_tree,
+    /* Add more CB here */
 
-        0 /*  Last member must be NULL */
+    0 /*  Last member must be NULL */
 	};
 
 /* clear node <node-name> protocol ... */
