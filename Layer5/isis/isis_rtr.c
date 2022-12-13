@@ -13,15 +13,11 @@ bool isis_is_protocol_enable_on_node(node_t *node) {
 
 void isis_init(node_t *node) {
   isis_node_info_t *isis_node_info = ISIS_NODE_INFO(node);
-  if (!isis_node_info) {
-    printf("node is already init");
-    return;
-  }
+  if (isis_node_info) return;
 
   isis_node_info = calloc(1, sizeof(isis_node_info_t));
   /*ISIS_NODE_INFO(node) = isis_node_info*/
   node->node_nw_prop.isis_node_info = isis_node_info;
-  printf("init node success");
 }
 
 void isis_de_init(node_t *node) {
