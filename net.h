@@ -80,7 +80,7 @@ typedef struct node_nw_prop_{
     rt_table_t *rt_table;
 
     ddcp_db_t *ddcp_db;
-	stp_node_info_t *stp_node_info;
+	  stp_node_info_t *stp_node_info;
 
     /*L3 properties*/ 
     bool is_lb_addr_config;
@@ -94,6 +94,8 @@ typedef struct node_nw_prop_{
 
     /*Device level Appln DS*/
     nmp_t *nmp;
+
+    void *isis_node_info;
 
 	/* Traffic generation */
 	glthread_t traffic_gen_db_head;
@@ -151,7 +153,7 @@ typedef struct intf_nw_props_ {
 
     /*L1 Properties*/
     bool is_up;
-	uint32_t ifindex;
+	  uint32_t ifindex;
 
     /*L2 properties*/
     mac_add_t mac_add;              /*Mac are hard burnt in interface NIC*/
@@ -160,6 +162,7 @@ typedef struct intf_nw_props_ {
     bool is_ipadd_config_backup;
     ddcp_interface_prop_t *ddcp_interface_prop;
     intf_nmp_t *nmp;
+    void *isis_intf_info;
     stp_vlan_intf_info_t *stp_vlan_intf_info;
     /*L3 properties*/
     bool is_ipadd_config; 
@@ -169,7 +172,7 @@ typedef struct intf_nw_props_ {
     /*Interface Statistics*/
     uint32_t pkt_recv;
     uint32_t pkt_sent;
-	uint32_t xmit_pkt_dropped;
+	  uint32_t xmit_pkt_dropped;
 } intf_nw_props_t;
 
 typedef union intf_prop_changed_ {
