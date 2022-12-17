@@ -5,8 +5,11 @@
   ((isis_intf_info_t *)(intf_ptr->intf_nw_props.isis_intf_info))
 
 typedef struct isis_intf_info_ {
-//
-} isis_intf_info;
+
+  uint32_t cost;
+  uint16_t hello_interval ; 
+
+} isis_intf_info_t;
 
 bool isis_node_intf_is_enable(interface_t *intf);
 void isis_enable_protocol_on_interface(interface_t *intf);

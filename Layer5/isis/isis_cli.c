@@ -79,7 +79,7 @@ static int isis_intf_config_handler(param_t *param, ser_buff_t *tlv_buf, op_mode
   tlv_struct_t *tlv = NULL;
   char *node_name = NULL;
   node_t *node;
-  char *if_name = NULL;
+  char *if_name;
   interface_t *interface = NULL;
 
   cmdcode = EXTRACT_CMD_CODE(tlv_buf);
@@ -95,12 +95,6 @@ static int isis_intf_config_handler(param_t *param, ser_buff_t *tlv_buf, op_mode
   } TLV_LOOP_END;
 
   node = node_get_node_by_name(topo, node_name);
-  interface = node_get_intf_by_name(node, if_name);
-
-  if (!interface) {
-    printf("Error: Interface do not exist\n");
-    return -1;
-  }
 
   switch(cmdcode) {
     case CMDCODE_CONF_NODE_ISIS_PROTO_INTF_ALL_ENABLE:
@@ -108,15 +102,32 @@ static int isis_intf_config_handler(param_t *param, ser_buff_t *tlv_buf, op_mode
         /*conf node <node-name> protocol isis interface all*/
         case CONFIG_ENABLE:
           printf("config enabled on all interfaces\n");
+          ITERATE_NODE_INTERFACES_BEGIN(node, interface) {
+
+            isis_enable_protocol_on_interface(interface);
+
+          } ITERATE_NODE_INTERFACES_END(node, interface);
           break;
         /*conf node <node-name> no protocol isis interface all*/
         case CONFIG_DISABLE:
           printf("config disabled on all interfaces\n");
+          ITERATE_NODE_INTERFACES_BEGIN(node, interface) {
+
+            isis_disable_protocol_on_interface(interface);
+
+          } ITERATE_NODE_INTERFACES_END(node, interface);
           break;  
         default:;
       }
       break;
     case CMDCODE_CONF_NODE_ISIS_PROTO_INTF_ENABLE:
+      interface = node_get_intf_by_name(node, if_name);
+      //printf("if_name: %s\n", if_name);
+      if (!interface) {
+        printf("Error: Interface do not exist\n");
+        return -1;
+      }
+
       switch(enable_or_disable) {
         case CONFIG_ENABLE:
           isis_enable_protocol_on_interface(interface);
@@ -147,7 +158,7 @@ int isis_config_cli_tree(param_t *param) {
       {
         /*config node <node-name> protocol isis interface all*/
         static param_t all;
-        init_param(&all, CMD, "all", isis_intf_config_handler, 0, INVALID, 0, "all interfaces");
+        init_param(&all, CMD, "all", isis_intf_config_handler, 0, INVALID, 0, ("All Interfaces"));
         libcli_register_param(&interface, &all);
         set_param_cmd_code(&all, CMDCODE_CONF_NODE_ISIS_PROTO_INTF_ALL_ENABLE);
       }
