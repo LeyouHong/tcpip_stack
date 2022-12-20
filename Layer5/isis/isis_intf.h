@@ -4,7 +4,7 @@
 typedef struct isis_intf_info_ {
 
   uint32_t cost;
-  uint16_t hello_interval ; 
+  uint16_t hello_interval; 
   timer_event_handle *hello_xmit_timer;
 
 } isis_intf_info_t;
@@ -13,13 +13,13 @@ typedef struct isis_intf_info_ {
   ((isis_intf_info_t *)(intf_ptr->intf_nw_props.isis_intf_info))
 
 #define ISIS_INTF_COST(intf_ptr) \
-  (((isis_intf_info_t *)((intf_ptr)->intf_nw_props.isis_intf_info))->cost)
+  (((isis_intf_info_t *)(intf_ptr->intf_nw_props.isis_intf_info))->cost)
 
 #define ISIS_INTF_HELLO_INTERVAL(intf_ptr) \
-  (((isis_intf_info_t *)((intf_ptr)->intf_nw_props.isis_intf_info))->hello_interval)
+  (((isis_intf_info_t *)(intf_ptr->intf_nw_props.isis_intf_info))->hello_interval)
 
 #define ISIS_INTF_HELLO_XMIT_TIMER(intf_ptr) \
-  (((isis_intf_info_t *)((intf_ptr)->intf_nw_props.isis_intf_info))->hello_xmit_timer)
+  (((isis_intf_info_t *)(intf_ptr->intf_nw_props.isis_intf_info))->hello_xmit_timer)
 
 bool isis_node_intf_is_enable(interface_t *intf);
 

@@ -13,7 +13,7 @@ void isis_pkt_receive(void *arg, size_t arg_size) {
   printf("%s() invoked\n", __FUNCTION__);
 }
 
-byte* isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {
+byte *isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {
   byte *temp;
   isis_pkt_hdr_t *hello_pkt_hdr;
 
@@ -45,7 +45,7 @@ byte* isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {
   temp=(byte *)(hello_pkt_hdr + 1);
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_HOSTNAME, NODE_NAME_SIZE, intf->att_node->node_name);
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_RTR_ID, 4, (byte *)&hello_pkt_hdr->rtr_id);
-
+ 
   uint32_t ip_addr_int = tcp_ip_covert_ip_p_to_n(IF_IP(intf));
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_IF_IP, 4, (byte *)&ip_addr_int);
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_IF_INDEX, 4, (byte *)&IF_INDEX(intf));
@@ -57,6 +57,6 @@ byte* isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_METRIC_VAL, 4, (byte *)&cost);
 
   SET_COMMON_ETH_FCS(hello_eth_hdr, eth_hdr_payload_size, 0);
-
+  printf("line 60\n");
   return (byte *)hello_eth_hdr;
 }
