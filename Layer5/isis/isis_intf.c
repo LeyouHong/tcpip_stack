@@ -76,7 +76,10 @@ void isis_start_sending_hellos(interface_t *intf) {
   assert(ISIS_INTF_HELLO_XMIT_TIMER(intf) == NULL);
   assert(isis_node_intf_is_enable(intf));
 
+  node = intf->att_node;
+
   wheel_timer_t *wt = node_get_timer_instance(node);
+ 
   printf("clock_tic_interval: %d\n", wt->clock_tic_interval);
 
   byte *hello_pkt = isis_prepare_hello_pkt(intf, &hello_pkt_size); 
@@ -84,7 +87,7 @@ void isis_start_sending_hellos(interface_t *intf) {
   isis_timer_data_t *isis_timer_data = 
     calloc(1, sizeof(isis_timer_data_t));
 
-  isis_timer_data->node = intf->att_node;
+  isis_timer_data->node = node;
   isis_timer_data->intf = intf;
   isis_timer_data->data = (void *)hello_pkt;
   isis_timer_data->data_size = hello_pkt_size;

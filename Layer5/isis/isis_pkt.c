@@ -57,6 +57,6 @@ byte *isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {
   temp = tlv_buffer_insert_tlv(temp, ISIS_TLV_METRIC_VAL, 4, (byte *)&cost);
 
   SET_COMMON_ETH_FCS(hello_eth_hdr, eth_hdr_payload_size, 0);
-  printf("line 60\n");
+
   return (byte *)hello_eth_hdr;
 }
