@@ -19,5 +19,6 @@ typedef struct isis_pkt_hdr_{
 bool isis_pkt_trap_rule(char *pkt, size_t pkt_size);
 void isis_pkt_receive(void *arg, size_t arg_size);
 byte* isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size);
+void isis_print_pkt(void *arg, size_t arg_size);
 
 #endif

@@ -30,7 +30,6 @@ void isis_enable_protocol_on_interface(interface_t *intf) {
     intf_info->hello_interval = ISIS_DEFAULT_HELLO_INTERVAL;
     intf_info->cost = ISIS_DEFAULT_INTF_COST;
     intf->intf_nw_props.isis_intf_info = intf_info;
-    printf("line-33\n");
   }
 
   if(intf_info->hello_xmit_timer == NULL) {
@@ -79,8 +78,6 @@ void isis_start_sending_hellos(interface_t *intf) {
   node = intf->att_node;
 
   wheel_timer_t *wt = node_get_timer_instance(node);
- 
-  printf("clock_tic_interval: %d\n", wt->clock_tic_interval);
 
   byte *hello_pkt = isis_prepare_hello_pkt(intf, &hello_pkt_size); 
 
@@ -93,7 +90,6 @@ void isis_start_sending_hellos(interface_t *intf) {
   isis_timer_data->data_size = hello_pkt_size;
 
   int timer_interval = ISIS_INTF_HELLO_INTERVAL(intf);
-  printf("ISIS_INTF_HELLO_INTERVAL return %s\n", timer_interval);
 
   ISIS_INTF_HELLO_XMIT_TIMER(intf) = timer_register_app_event(wt, 
                            isis_transmit_hello, 

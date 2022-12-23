@@ -35,6 +35,7 @@ extern void init_tcp_logging();
 extern void init_spf_algo();
 extern void network_start_pkt_receiver_thread();
 extern void ut_parser_init();
+extern void isis_one_time_registration();
 
 void
 init_tcp_ip_stack(){
@@ -48,5 +49,8 @@ init_tcp_ip_stack(){
  	init_spf_algo();
 
 	network_start_pkt_receiver_thread();
+
+  isis_one_time_registration();
+  
 	ut_parser_init();
 }
