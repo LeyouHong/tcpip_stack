@@ -2,6 +2,8 @@
 #include "isis_pkt.h"
 #include "isis_const.h"
 #include "isis_intf.h"
+#include "isis_adjacency.h"
+#include "isis_rtr.h"
 
 bool isis_pkt_trap_rule(char *pkt, size_t pkt_size) {
   ethernet_hdr_t *eth_hdr = (ethernet_hdr_t *)pkt;
@@ -9,8 +11,86 @@ bool isis_pkt_trap_rule(char *pkt, size_t pkt_size) {
   return eth_hdr->type == ISIS_ETH_PKT_TYPE;
 }
 
+static void isis_process_hello_pkt(node_t *node, 
+                                   interface_t *iif, 
+                                   ethernet_hdr_t *hello_eth_hdr, 
+                                   size_t pkt_size) {
+  uint8_t intf_ip_len;
+  char if_ip_addr_str[16];
+
+  if(!isis_node_intf_is_enable(iif)) {
+    return;
+  }
+
+  if(!isis_interface_qualify_to_send_hellos(iif)) {
+    return;
+  }        
+
+  if (!IS_MAC_BROADCAST_ADDR(hello_eth_hdr->dst_mac.mac)) {
+    goto bad_hello;
+  }
+
+  isis_pkt_hdr_t *hello_pkt_hdr = (isis_pkt_hdr_t *)
+    GET_ETHERNET_HDR_PAYLOAD(hello_eth_hdr);
+  
+  byte *hello_tlv_buffer = (byte *)(hello_pkt_hdr + 1);
+
+  size_t tlv_buff_size = pkt_size - ETH_HDR_SIZE_EXCL_PAYLOAD - sizeof(isis_pkt_hdr_t);
+
+  uint32_t *if_ip_addr_int = 
+    (uint32_t *)tlv_buffer_get_particular_tlv(hello_tlv_buffer, 
+                                              tlv_buff_size,
+                                              ISIS_TLV_IF_IP,
+                                              &intf_ip_len);
+  if(!if_ip_addr_int) goto bad_hello;
+
+  tcp_ip_covert_ip_n_to_p(*if_ip_addr_int, if_ip_addr_str);
+  
+
+  if (!is_same_subnet(IF_IP(iif), 
+      iif->intf_nw_props.mask, 
+      (unsigned char*)if_ip_addr_str)) {
+    goto bad_hello;
+  }
+
+  isis_update_interface_adjacency_from_hello(iif, hello_tlv_buffer, tlv_buff_size);
+
+  return;
+
+  bad_hello: 
+    printf("Hello pkt rejected, %s %s\n", node->node_name, iif->if_name);
+}
+
+static void isis_process_lsp_pkt(node_t *node, 
+                                   interface_t *iif, 
+                                   ethernet_hdr_t *eth_hdr, 
+                                   size_t pkt_size) {
+
+}
+
 void isis_pkt_receive(void *arg, size_t arg_size) {
-  //printf("%s() invoked\n", __FUNCTION__);
+  pkt_notif_data_t *pkt_notif_data = (pkt_notif_data_t *)arg;
+  
+  node_t *node = pkt_notif_data->recv_node;
+  interface_t *iif = pkt_notif_data->recv_interface;
+  ethernet_hdr_t *eth_hdr = (ethernet_hdr_t *)pkt_notif_data->pkt;
+  uint32_t pkt_size = pkt_notif_data->pkt_size;
+
+  if(!isis_is_protocol_enable_on_node(node)) {
+    return;
+  }
+
+  isis_pkt_hdr_t *pkt_hdr = (isis_pkt_hdr_t *)GET_ETHERNET_HDR_PAYLOAD(eth_hdr);
+
+  switch(pkt_hdr->isis_pkt_type) {
+    case ISIS_PTP_HELLO_PKT_TYPE:
+      isis_process_hello_pkt(node, iif, eth_hdr, pkt_size);
+      break;
+    case ISIS_LSP_PKT_TYPE:
+      isis_process_lsp_pkt(node, iif, eth_hdr, pkt_size);
+      break;
+    default:;
+  }
 }
 
 byte *isis_prepare_hello_pkt(interface_t *intf, size_t *hello_pkt_size) {

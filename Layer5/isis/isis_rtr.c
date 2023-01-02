@@ -2,6 +2,7 @@
 #include "isis_const.h"
 #include "isis_rtr.h"
 #include "isis_pkt.h"
+#include "isis_intf.h"
 
 bool isis_is_protocol_enable_on_node(node_t *node) {
     isis_node_info_t *isis_node_info = ISIS_NODE_INFO(node);
@@ -37,7 +38,19 @@ void isis_de_init(node_t *node) {
 }
 
 void isis_show_node_protocol_state(node_t *node) {
-  printf("ISIS Protocol: %s\n", isis_is_protocol_enable_on_node(node) ? "Enable" : "Disable");
+  interface_t *intf;
+  bool is_enabled  = isis_is_protocol_enable_on_node(node);
+
+  printf("ISIS Protocol : %sabled\n", is_enabled ? "En" : "Dis");
+
+  if (!is_enabled) return;
+
+  ITERATE_NODE_INTERFACES_BEGIN(node, intf) {
+    if (!isis_node_intf_is_enable(intf)) {
+      continue;
+    }
+    isis_show_interface_protocol_state(intf);
+  } ITERATE_NODE_INTERFACES_END(node, intf);
 }
 
 void isis_one_time_registration() {

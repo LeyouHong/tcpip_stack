@@ -25,4 +25,11 @@
 #define ISIS_TLV_IF_MAC     131 // Imaginary
 #define ISIS_TLV_IP_REACH   130
 
+/* Feature Name for logging */
+#define ISIS_ADJ_MGMT   " ISIS(ADJ MGMT)"
+#define ISIS_LSPDB_MGMT " ISIS(LSPDB MGMT)"
+#define ISIS_SPF        " ISIS(SPF)"
+#define ISIS_ERROR      " ISIS(ERROR)"
+#define ISIS_PKT        " ISIS(PKT)"
+
 #endif

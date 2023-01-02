@@ -3,6 +3,7 @@
 #include "isis_rtr.h"
 #include "isis_const.h"
 #include "isis_pkt.h"
+#include "isis_adjacency.h"
 
 bool isis_node_intf_is_enable(interface_t *intf) {
     return !(intf->intf_nw_props.isis_intf_info == NULL);
@@ -121,4 +122,37 @@ void isis_stop_sending_hellos(interface_t *intf) {
 
 bool isis_interface_qualify_to_send_hellos(interface_t *intf) {
   return isis_node_intf_is_enable(intf) && IS_INTF_L3_MODE(intf) &&  IF_IS_UP(intf);
+}
+
+void isis_show_interface_protocol_state(interface_t *intf) {
+  bool is_enabled;
+  glthread_t *curr;
+  isis_adjacency_t *adjacency = NULL;
+  isis_intf_info_t *intf_info = NULL;
+
+  is_enabled = isis_node_intf_is_enable(intf);
+
+  printf(" %s : %sabled\n", intf->if_name, is_enabled ? "En" : "Dis");
+  
+  if(!is_enabled) return;
+
+  intf_info = intf->intf_nw_props.isis_intf_info;
+
+  PRINT_TABS(2);
+  printf("hello interval : %u sec, Intf Cost : %u\n",
+      intf_info->hello_interval, intf_info->cost);
+
+  PRINT_TABS(2);
+  printf("hello Transmission : %s\n",
+      ISIS_INTF_HELLO_XMIT_TIMER(intf) ? "On" : "Off"); 
+  
+  PRINT_TABS(2);
+  printf("Adjacencies :\n");
+
+  ITERATE_GLTHREAD_BEGIN(ISIS_INTF_ADJ_LST_HEAD(intf), curr) {
+      adjacency = glthread_to_isis_adjacency(curr);
+      isis_show_adjacency(adjacency, 4);
+      printf("\n");
+  } ITERATE_GLTHREAD_END(ISIS_INTF_ADJ_LST_HEAD(intf), curr)
+  printf("\n");
 }
